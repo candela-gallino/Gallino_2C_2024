@@ -1,25 +1,42 @@
-/*! @mainpage Template
+/*! @mainpage Ejercicio 4-5-6 Proyecto 1
  *
  * @section genDesc General Description
- *
+ * El proyecto consiste en recibir un dato de 32 bits el cual se va a mostrar en el Display 
  * This section describes how the program works.
  *
  * <a href="https://drive.google.com/...">Operation Example</a>
  *
  * @section hardConn Hardware Connection
  *
- * |    Peripheral  |   ESP32   	|
+ * |    PERIFERICO  |   EDU-ESP   	|
  * |:--------------:|:--------------|
- * | 	PIN_X	 	| 	GPIO_X		|
+ * | 	D1   	 	| 	GPIO_20
+ * |:--------------:|:--------------|
+ * | 	D2    	 	| 	GPIO_21
+ * |:--------------:|:--------------|
+ * | 	D3   	 	| 	GPIO_22
+ * |:--------------:|:--------------|
+ * | 	D4   	 	| 	GPIO_23
+ * |:--------------:|:--------------|
+ * | 	SEL_1   	| 	GPIO_19
+ * |:--------------:|:--------------|
+ * | 	SEL_2   	| 	GPIO_18
+ * |:--------------:|:--------------|
+ * | 	SEL_3   	| 	GPIO_9
+ * |:--------------:|:--------------|
+ * | 	5V   	 	| 	5V
+ * |:--------------:|:--------------|
+ * | 	GND   	 	| 	GND         | 
+ * 
  *
  *
  * @section changelog Changelog
  *
  * |   Date	    | Description                                    |
  * |:----------:|:-----------------------------------------------|
- * | 12/09/2023 | Document creation		                         |
+ * | 29/08/2024 | Document creation		                         |
  *
- * @author Albano Peñalva (albano.penalva@uner.edu.ar)
+ * @author Gallino Candela (candela.gallino@ingenieria.uner.edu.ar)
  *
  */
 
@@ -31,6 +48,7 @@
 /*==================[macros and definitions]=================================*/
 
 /*==================[internal data definition]===============================*/
+//estructura para generar gpio
 typedef struct
 {
 	gpio_t pin;
@@ -38,6 +56,13 @@ typedef struct
 } gpioConf_t;
 
 /*==================[internal functions declaration]=========================*/
+/** @fn convertToBcdArray(uint32_t data, uint8_t digits, uint8_t *bcd_number)
+ * @brief  		Convierte el dato a BCD 
+ * @param[in]  	data: dato de 32 bits
+ * @param[in]  	digits: dato en BCD de 8 bits 
+ * @param[out]  bcd_number: arreglo que guarda los datos 
+ * @retval	cero
+ */
 int8_t convertToBcdArray(uint32_t data, uint8_t digits, uint8_t *bcd_number)
 {
 
@@ -52,6 +77,14 @@ int8_t convertToBcdArray(uint32_t data, uint8_t digits, uint8_t *bcd_number)
 }
 // esta funcion lo que va a hacer es recibir el digito del arreglo (por ejemplo va a recibirme si es GPIO20,GPIO21 etc..) y va a recorrer un for en donde
 // por ejemplo si tenemos 0110&0001 tendriamos un cero (ver lo que hace &) estaria en bajo por lo que llamamos al GPIOOff
+/**
+ * @fn Mapear bits
+ * @brief  		Esta funcion va a recibir un digito en BCD y va a mapear los bits bo-> GPIO_20, b1-> GPIO_21
+ *              b2->GPIO_22 b2->GPIO_23
+ * @param[in]  	arreglo: vector de estructuras del tipo gpioConf_t
+ * @param[in]  	digits: digito BCD
+ * @retval 		None
+ */
 void mapearbits(gpioConf_t *arreglo, uint8_t digits)
 {
 	for (int j = 0; j < 4; j++)
@@ -62,6 +95,16 @@ void mapearbits(gpioConf_t *arreglo, uint8_t digits)
 			GPIOOff(arreglo[j].pin);
 	}
 }
+/**
+ * @fn Mostrar tres digitos 
+ * @brief  		Esta funcion va a recibir un digito de 32 bits y va a mapear los digitos con los puertos del LCD
+ *              siendo digito1->GPIO_19 digito2->GPIO_18 digito3->GPIO_9 
+ * @param[in]  	arreglo1: arreglo del tipo gpioConf_t
+ * @param[in]  	arreglo2: arreglo del tipo gpioConf_t
+ * @param[in]  	digitoin: dato de 32 bits
+ * @param[in]  	digitoout: digito de salida de 8 bits
+ * @retval 		None
+ */
 
 void mostrar_tres_digitos(gpioConf_t *arreglo1, gpioConf_t *arreglo2, uint32_t digitoin, uint8_t digitoout)
 {
