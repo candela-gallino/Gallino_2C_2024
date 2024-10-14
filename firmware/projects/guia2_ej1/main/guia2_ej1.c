@@ -1,8 +1,19 @@
-/*! @mainpage Template
+/*! @mainpage Ejercicio 1 proyecto 2 
  *
  * @section genDesc General Description
  *
- * This section describes how the program works.
+ * Diseñar el firmware modelando con un diagrama de flujo de manera que cumpla con las 
+ * siguientes funcionalidades:
+ * Mostrar distancia medida utilizando los leds de la siguiente manera:
+ * Si la distancia es menor a 10 cm, apagar todos los LEDs.
+ * Si la distancia está entre 10 y 20 cm, encender el LED_1.
+ * Si la distancia está entre 20 y 30 cm, encender el LED_2 y LED_1.
+ * Si la distancia es mayor a 30 cm, encender el LED_3, LED_2 y LED_1.
+ * Mostrar el valor de distancia en cm utilizando el display LCD.
+ * Usar TEC1 para activar y detener la medición.
+ * Usar TEC2 para mantener el resultado (“HOLD”).
+ * Refresco de medición: 1 s
+
  *
  * <a href="https://drive.google.com/...">Operation Example</a>
  *
@@ -10,14 +21,17 @@
  *
  * |    Peripheral  |   ESP32   	|
  * |:--------------:|:--------------|
- * | 	PIN_X	 	| 	GPIO_X		|
+ * | 	ECHO	 	| 	GPIO_3		|
+ * | 	TRIGGER	 	| 	GPIO_2		|
+ * | 	+5V 	 	| 	+5V 		|
+ * | 	GND 	 	| 	GND  		|
  *
  *
  * @section changelog Changelog
  *
  * |   Date	    | Description                                    |
  * |:----------:|:-----------------------------------------------|
- * | 12/09/2023 | Document creation		                         |
+ * | 09/10/2024 | Document creation		                         |
  *
  * @author Candela Gallino (candela.gallino@uner.edu.ar)
  *
@@ -40,16 +54,36 @@
 #define TIEMPO_DELAY 1000
 
 /*==================[internal data definition]===============================*/
+/** 
+ * @brief Manejador de la tarea de teclas.
+ */
 TaskHandle_t teclas_task_handle = NULL;
+/** 
+ * @brief Manejador de la tarea de medición.
+ */
 TaskHandle_t medir_task_handle = NULL;
+/** 
+ * @brief Manejador de la tarea de visualización.
+ */
 TaskHandle_t mostrar_task_handle = NULL;
+/** 
+ * @brief Manejador de la tarea de LEDs.
+ */
 TaskHandle_t leds_task_handle = NULL;
+/** 
+ * @brief Indica si el sistema está encendido.
+ */
 bool on = true;
+
 bool hold = false;
 uint16_t distancia = 0;
 
 /*==================[internal functions declaration]=========================*/
-
+/**
+ * @brief Tarea para manejar las entradas de las teclas.
+ * 
+ * @param pvParameter Parámetro de la tarea (no utilizado).
+ */
 static void teclasTask(void *pvParameter)
 {
 	uint8_t teclas;
@@ -69,7 +103,11 @@ static void teclasTask(void *pvParameter)
 		vTaskDelay(TIEMPO_TECLAS / portTICK_PERIOD_MS);
 	}
 }
-
+/**
+ * @brief Tarea para medir la distancia utilizando un sensor 
+ * 
+ * @param pvParameter Parámetro de la tarea (no utilizado).
+ */
 static void medirTask(void *pvParameter)
 {
 
@@ -80,7 +118,11 @@ static void medirTask(void *pvParameter)
 		vTaskDelay(TIEMPO_DELAY / portTICK_PERIOD_MS);
 	}
 }
-
+/**
+ * @brief Tarea para mostrar la distancia medida 
+ * 
+ * @param pvParameter Parámetro de la tarea (no utilizado).
+ */
 static void mostrarTask(void *pvParameter)
 {
 	while (true)
@@ -97,7 +139,11 @@ static void mostrarTask(void *pvParameter)
 		vTaskDelay(TIEMPO_DELAY / portTICK_PERIOD_MS);
 	}
 }
-
+/**
+ * @brief Tarea para controlar el estado de los LEDs en función de la distancia medida.
+ * 
+ * @param pvParameter Parámetro de la tarea (no utilizado).
+ */
 static void ledsTask(void *pvParameter)
 {
 	while (true)
