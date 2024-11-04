@@ -40,7 +40,13 @@
             "path": "projects/guia2_ej4"
         },
         {
-            "path": "projects/Proyecto_Integrador"
+            "path": "../../Proyecto_Integrador_Gallino_Remedi/firmware/examples/Proyecto_Integrador"
+        },
+        {
+            "path": "projects/ejer_repaso"
+        },
+        {
+            "path": "projects/parcial_epro"
         }
     ],
     "settings": {
